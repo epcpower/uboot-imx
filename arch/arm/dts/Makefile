@@ -1181,7 +1181,8 @@ dtb-$(CONFIG_ARCH_IMX8M) += \
 	imx8mp-navqp.dtb \
 	imx8mq-pico-pi.dtb \
 	imx8mq-kontron-pitx-imx8m.dtb \
-	imx8mq-librem5-r4.dtb
+	imx8mq-librem5-r4.dtb \
+	imx8mn-epc-som-rev2-base-rev3.dtb
 
 dtb-$(CONFIG_ARCH_IMX9) += \
 	imx95-15x15-evk.dtb \
