@@ -24,6 +24,8 @@
 #include <linux/err.h>
 #include <linux/compiler.h>
 
+#define LOG_DEBUG
+
 DECLARE_GLOBAL_DATA_PTR;
 
 /* Generic PHY support and helper functions */
