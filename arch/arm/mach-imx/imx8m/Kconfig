@@ -218,6 +218,15 @@ config TARGET_IMX8MN_DDR4_EVK
 	select FSL_BLOB
 	select SPL_CRYPTO if SPL
 
+config TARGET_IMX8MN_EPC_SOM
+	bool "imx8mn EPC POWER SOM board"
+	select IMX8MN
+	select SUPPORT_SPL
+	select IMX8M_DDR4
+	select FSL_CAAM
+	select FSL_BLOB
+	select SPL_CRYPTO if SPL
+
 config TARGET_IMX8MN_DDR3_EVK
 	bool "imx8mn 11x11 DDR3 EVK board"
 	select IMX8MN
@@ -273,6 +282,15 @@ config TARGET_IMX8MP_DATA_MODUL_EDM_SBC
 
 config TARGET_IMX8MP_BEACON
 	bool "imx8mm Beacon Embedded devkit"
+	select IMX8MP
+	select SUPPORT_SPL
+	select IMX8M_LPDDR4
+	select FSL_CAAM
+	select ARCH_MISC_INIT
+	select SPL_CRYPTO if SPL
+
+config TARGET_IMX8MP_EPC_TAU
+	bool "imx8mp EPC Power TAU board"
 	select IMX8MP
 	select SUPPORT_SPL
 	select IMX8M_LPDDR4
@@ -465,6 +483,8 @@ source "board/freescale/imx8mm_ab2/Kconfig"
 source "board/freescale/imx8mm_evk/Kconfig"
 source "board/freescale/imx8mn_evk/Kconfig"
 source "board/freescale/imx8mp_evk/Kconfig"
+source "board/epcpower/imx8mn_epc_som/Kconfig"
+source "board/epcpower/imx8mp_epc_tau/Kconfig"
 source "board/gateworks/venice/Kconfig"
 source "board/google/imx8mq_phanbell/Kconfig"
 source "board/kontron/pitx_imx8m/Kconfig"

@@ -1,0 +1,6 @@
+i.MX8MP TAU BOARD
+M:	Aapo Naalisvaara <aapo.naalisvaara.ext@epcpower.com>
+S:	Maintained
+F:	board/epcpower/imx8mp_epc_tau/
+F:	include/configs/imx8mp_epc_tau.h
+F:	configs/imx8mp_epc_tau_defconfig
