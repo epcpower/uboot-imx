@@ -1,0 +1,15 @@
+if TARGET_IMX8MP_EPC_TAU
+
+config SYS_BOARD
+	default "imx8mp_epc_tau"
+
+config SYS_VENDOR
+	default "epcpower"
+
+config SYS_CONFIG_NAME
+	default "imx8mp_epc_tau"
+
+config IMX_CONFIG
+	default "board/epcpower/imx8mp_epc_tau/imximage-8mp-lpddr4.cfg"
+
+endif
