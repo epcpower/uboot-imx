@@ -1,0 +1,45 @@
+arch=arm
+board=epc_som
+bootargs_extra=quiet
+bootcounter=0
+bootdelay=0
+bootlimit=5
+bootscript_name=boot.scr
+bootscript_request=1
+console=ttymxc1,115200
+emmc_dev=2
+loadbootscript=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${bootscript_name};
+ethprime=FEC
+image=fitImage
+loadaddr=0x40400000
+mmcdev=2
+mmcpart=1
+loadimage=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${image}
+mmcroot=PARTUUID=89d538fa-58b1-4fbe-8049-4e4a473381eb rw
+mmcargs=env set bootargs ${jh_clk} console=${console} root=${mmcroot} ${bootargs_extra}
+mmcboot=echo Booting from mmc ...; \
+mmc dev ${mmcdev}; \
+if mmc rescan; then \
+    run mmcargs; \
+    bootm ${loadaddr}; \
+else \
+    echo WARN: Booting image from mmc failed!; \
+fi;
+bootcmd=echo Running boot command...; \
+mmc dev ${mmcdev}; \
+if mmc rescan; then \
+    if test ${bootscript_request} -eq 1; then \
+        env set bootscript_request 0; \
+        echo Loading boot script...; \
+        if run loadbootscript; then \
+            source; \
+        else \
+            echo ERR: Loading boot script failed!; \
+        fi; \
+    fi; \
+    if run loadimage; then \
+        run mmcboot; \
+    else \
+        echo ERR: Loading image failed!; \
+    fi; \
+fi;

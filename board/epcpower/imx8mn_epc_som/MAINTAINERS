@@ -1,0 +1,6 @@
+i.MX8MN SOM BOARD
+M:	Aapo Naalisvaara <aapo.naalisvaara.ext@epcpower.com>
+S:	Maintained
+F:	board/epcpower/imx8mn_epc_som/
+F:	include/configs/imx8mn_epc_som.h
+F:	configs/imx8mn_epc_som_defconfig
