@@ -22,15 +22,17 @@
 #include <spl.h>
 #include <asm/mach-imx/dma.h>
 #include <power/pmic.h>
-#include "../common/tcpc.h"
+#include "../../freescale/common/tcpc.h"
 #include <usb.h>
 #include <dwc3-uboot.h>
 #include <mmc.h>
+#include <asm/gpio.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
 #define UART_PAD_CTRL	(PAD_CTL_DSE6 | PAD_CTL_FSEL1)
 #define WDOG_PAD_CTRL	(PAD_CTL_DSE6 | PAD_CTL_ODE | PAD_CTL_PUE | PAD_CTL_PE)
+#define BREV_PAD_CTRL   (PAD_CTL_PUE)
 
 static iomux_v3_cfg_t const uart_pads[] = {
 	MX8MP_PAD_UART2_RXD__UART2_DCE_RX | MUX_PAD_CTRL(UART_PAD_CTRL),
@@ -39,6 +41,12 @@ static iomux_v3_cfg_t const uart_pads[] = {
 
 static iomux_v3_cfg_t const wdog_pads[] = {
 	MX8MP_PAD_GPIO1_IO02__WDOG1_WDOG_B  | MUX_PAD_CTRL(WDOG_PAD_CTRL),
+};
+
+static iomux_v3_cfg_t const brev_pads[] = {
+	MX8MP_PAD_GPIO1_IO06__GPIO1_IO06 | MUX_PAD_CTRL(BREV_PAD_CTRL),
+	MX8MP_PAD_GPIO1_IO05__GPIO1_IO05 | MUX_PAD_CTRL(BREV_PAD_CTRL),
+	MX8MP_PAD_GPIO1_IO14__GPIO1_IO14 | MUX_PAD_CTRL(BREV_PAD_CTRL),
 };
 
 #ifdef CONFIG_NAND_MXS
@@ -66,6 +74,55 @@ struct efi_capsule_update_info update_info = {
 
 #endif /* EFI_HAVE_CAPSULE_SUPPORT */
 
+static int _gpio_get_value(const char *name, const char *label) {
+	struct gpio_desc desc;
+	int val, ret;
+
+	ret = dm_gpio_lookup_name(name, &desc);
+	if (ret) {
+		printf("%s: dm_gpio_lookup_name: %s: %d\n", __func__, name, ret);
+		return ret;
+	}
+
+	ret = dm_gpio_request(&desc, label);
+	if (ret) {
+		printf("%s: dm_gpio_request: %s: %d\n", __func__, label, ret);
+		return ret;
+	}
+
+	dm_gpio_set_dir_flags(&desc, GPIOD_IS_IN);
+
+	val = dm_gpio_get_value(&desc);
+	if (val < 0) {
+		printf("%s: dm_gpio_get_value: %s: %d\n", __func__, label, val);
+		return val;
+	}
+
+	return val;
+}
+
+static int read_base_rev(void)
+{
+	int v0, v1, v2;
+
+	v0 = _gpio_get_value("GPIO1_6", "MOAB-HWID0");
+	if (v0 < 0) {
+		return v0;
+	}
+
+	v1 = _gpio_get_value("GPIO1_5", "MOAB-HWID1");
+	if (v1 < 0) {
+		return v1;
+	}
+
+	v2 = _gpio_get_value("GPIO1_14", "MOAB-HWID2");
+	if (v2 < 0) {
+		return v2;
+	}
+
+	return (v2 << 2) | (v1 << 1) | v0;
+}
+
 int board_early_init_f(void)
 {
 	struct wdog_regs *wdog = (struct wdog_regs *)WDOG1_BASE_ADDR;
@@ -77,6 +134,8 @@ int board_early_init_f(void)
 	imx_iomux_v3_setup_multiple_pads(uart_pads, ARRAY_SIZE(uart_pads));
 
 	init_uart_clk(1);
+
+	imx_iomux_v3_setup_multiple_pads(brev_pads, ARRAY_SIZE(brev_pads));
 
 	return 0;
 }
@@ -430,14 +489,37 @@ int board_init(void)
 	return 0;
 }
 
+static int read_som_rev(void)
+{
+	// TODO read TAU hardware revision from OTP
+	return 0;
+}
+
 int board_late_init(void)
 {
 #ifdef CONFIG_ENV_IS_IN_MMC
 	board_late_mmc_env_init();
 #endif
 #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
-	env_set("board_name", "EVK");
-	env_set("board_rev", "iMX8MP");
+	int som_rev = read_som_rev();
+	if (som_rev >= 0) {
+		env_set_ulong("som_rev", som_rev);
+	} else {
+		printf("%s: setting som revision failed.\n", __func__);
+	}
+
+	int base_rev = read_base_rev();
+	if (base_rev >= 0) {
+		env_set_ulong("base_rev", base_rev);
+	} else {
+		printf("%s: setting base revision failed.\n", __func__);
+	}
+
+	char rev_buf[8];
+	snprintf(rev_buf, sizeof(rev_buf), "%d.%d", som_rev, base_rev);
+
+	env_set("board_name", "TAU");
+	env_set("board_rev", rev_buf);
 #endif
 
 	return 0;

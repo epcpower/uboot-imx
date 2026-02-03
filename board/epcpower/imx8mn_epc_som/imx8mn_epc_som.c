@@ -19,7 +19,7 @@
 #include <asm/mach-imx/mxc_i2c.h>
 #include <i2c.h>
 #include <asm/io.h>
-#include "../common/tcpc.h"
+#include "../../freescale/common/tcpc.h"
 #include <usb.h>
 
 DECLARE_GLOBAL_DATA_PTR;
@@ -330,7 +330,7 @@ int board_late_init(void)
 #endif
 
 #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
-	env_set("board_name", "DDR4 EVK");
+	env_set("board_name", "SOM");
 	env_set("board_rev", "iMX8MN");
 #endif
 	return 0;
