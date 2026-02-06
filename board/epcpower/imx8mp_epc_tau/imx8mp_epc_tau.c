@@ -34,10 +34,6 @@ DECLARE_GLOBAL_DATA_PTR;
 #define WDOG_PAD_CTRL	(PAD_CTL_DSE6 | PAD_CTL_ODE | PAD_CTL_PUE | PAD_CTL_PE)
 #define BREV_PAD_CTRL   (PAD_CTL_PUE)
 
-#define MOAB_HW_ID0 IMX_GPIO_NR(1, 6)
-#define MOAB_HW_ID1 IMX_GPIO_NR(1, 5)
-#define MOAB_HW_ID2 IMX_GPIO_NR(1, 14)
-
 static iomux_v3_cfg_t const uart_pads[] = {
 	MX8MP_PAD_UART2_RXD__UART2_DCE_RX | MUX_PAD_CTRL(UART_PAD_CTRL),
 	MX8MP_PAD_UART2_TXD__UART2_DCE_TX | MUX_PAD_CTRL(UART_PAD_CTRL),
@@ -499,32 +495,28 @@ static int read_som_rev(void)
 	return 0;
 }
 
-static void env_set_hwrevs(const char *som_var, const char *base_var)
-{
-	int som_rev = read_som_rev();
-	if (som_rev >= 0) {
-		env_set_ulong(som_var, som_rev);
-	} else {
-		printf("%s: setting %s failed.\n", __func__, som_var);
-	}
-
-	int base_rev = read_base_rev();
-	if (base_rev >= 0) {
-		env_set_ulong(base_var, base_rev);
-	} else {
-		printf("%s: setting %s failed.\n", __func__, base_var);
-	}
-}
-
 int board_late_init(void)
 {
 #ifdef CONFIG_ENV_IS_IN_MMC
 	board_late_mmc_env_init();
 #endif
 #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
+	int som_rev = read_som_rev();
+	if (som_rev >= 0) {
+		env_set_ulong("som_rev", som_rev);
+	} else {
+		printf("%s: setting som revision failed.\n", __func__);
+	}
+
+	int base_rev = read_base_rev();
+	if (base_rev >= 0) {
+		env_set_ulong("base_rev", base_rev);
+	} else {
+		printf("%s: setting base revision failed.\n", __func__);
+	}
+
 	env_set("board_name", "TAU");
-	env_set("board_rev", "iMX8MP");
-	env_set_hwrevs("som_rev", "base_rev");
+	env_set("board_rev", "%d.%d");
 #endif
 
 	return 0;
