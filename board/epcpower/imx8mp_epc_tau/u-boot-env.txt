@@ -1,7 +1,5 @@
 arch=arm
 board=epc_tau
-board_name=EPC Power i.MX8M Plus TAU board
-board_rev=rev1
 bootargs_extra=quiet
 bootcounter=0
 bootdelay=0
@@ -12,6 +10,20 @@ console=ttymxc1,115200
 emmc_dev=2
 loadbootscript=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${bootscript_name};
 ethprime=FEC
+fit_target=${loadaddr}
+fitargs=echo Confguring fit...; \
+if test "${board_rev}" = "0.0"; then \
+    env set fit_config conf-imx8mp-epc-tau.dtb; \
+elif test "${board_rev}" = "0.1"; then \
+    env set fit_config conf-imx8mp-epc-tau-base-rev1.dtb; \
+else \
+    echo WARN: No matching FIT configuration for board revision: ${board_rev}; \
+fi; \
+if test -n "${fit_config}"; then \
+    env set fit_target ${loadaddr}#${fit_config}; \
+else \
+    env set fit_target ${loadaddr}; \
+fi;
 image=fitImage
 loadaddr=0x40400000
 mmcdev=2
@@ -23,18 +35,15 @@ mmcboot=echo Booting from mmc ...; \
 mmc dev ${mmcdev}; \
 if mmc rescan; then \
     run mmcargs; \
-    if test -n ${fitconfig}; then \
-        bootm ${loadaddr}#{fitconfig}; \
-    else \
-        bootm ${loadaddr}; \
-    fi; \
+    run fitargs; \
+    bootm ${fit_target}; \
 else \
     echo WARN: Booting image from mmc failed!; \
 fi;
 bootcmd=echo Running boot command...; \
 mmc dev ${mmcdev}; \
 if mmc rescan; then \
-    if test -eq ${bootscript_request} 1; then \
+    if test ${bootscript_request} -eq 1; then \
         env set bootscript_request 0; \
         echo Loading boot script...; \
         if run loadbootscript; then \

@@ -1,8 +1,6 @@
 arch=arm
 board=epc_som
-board_name=EPC Power i.MX8 Nano DDR4 SOM Board
-board_rev=rev1
-bootargs_extra=panic=quiet
+bootargs_extra=quiet
 bootcounter=0
 bootdelay=0
 bootlimit=5
@@ -30,7 +28,7 @@ fi;
 bootcmd=echo Running boot command...; \
 mmc dev ${mmcdev}; \
 if mmc rescan; then \
-    if test -eq ${bootscript_request} 1; then \
+    if test ${bootscript_request} -eq 1; then \
         env set bootscript_request 0; \
         echo Loading boot script...; \
         if run loadbootscript; then \

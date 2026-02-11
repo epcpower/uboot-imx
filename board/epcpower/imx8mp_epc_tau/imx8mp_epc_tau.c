@@ -501,22 +501,22 @@ int board_late_init(void)
 	board_late_mmc_env_init();
 #endif
 #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
-	int som_rev = read_som_rev();
-	if (som_rev >= 0) {
-		env_set_ulong("som_rev", som_rev);
+	int rev_som = read_som_rev();
+	if (rev_som >= 0) {
+		env_set_ulong("rev_som", rev_som);
 	} else {
 		printf("%s: setting som revision failed.\n", __func__);
 	}
 
-	int base_rev = read_base_rev();
-	if (base_rev >= 0) {
-		env_set_ulong("base_rev", base_rev);
+	int rev_base = read_base_rev();
+	if (rev_base >= 0) {
+		env_set_ulong("rev_base", rev_base);
 	} else {
 		printf("%s: setting base revision failed.\n", __func__);
 	}
 
 	char rev_buf[8];
-	snprintf(rev_buf, sizeof(rev_buf), "%d.%d", som_rev, base_rev);
+	snprintf(rev_buf, sizeof(rev_buf), "%d.%d", rev_som, rev_base);
 
 	env_set("board_name", "TAU");
 	env_set("board_rev", rev_buf);
