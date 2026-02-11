@@ -2,7 +2,7 @@ arch=arm
 board=epc_som
 board_name=EPC Power i.MX8 Nano DDR4 SOM Board
 board_rev=rev1
-bootargs_extra=panic=${kernel_panic_timeout} quiet
+bootargs_extra=panic=quiet
 bootcounter=0
 bootdelay=0
 bootlimit=5
@@ -16,7 +16,6 @@ image=fitImage
 loadaddr=0x40400000
 mmcdev=2
 mmcpart=1
-kernel_panic_timeout=60
 loadimage=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${image}
 mmcroot=PARTUUID=89d538fa-58b1-4fbe-8049-4e4a473381eb rw
 mmcargs=env set bootargs ${jh_clk} console=${console} root=${mmcroot} ${bootargs_extra}
