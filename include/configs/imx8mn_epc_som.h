@@ -3,8 +3,8 @@
  * Copyright 2018 NXP
  */
 
-#ifndef __IMX8MN_EVK_H
-#define __IMX8MN_EVK_H
+#ifndef __IMX8MN_EPC_SOM_H
+#define __IMX8MN_EPC_SOM_H
 
 #include <linux/sizes.h>
 #include <linux/stringify.h>
