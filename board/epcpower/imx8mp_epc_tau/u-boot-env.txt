@@ -11,7 +11,7 @@ emmc_dev=2
 loadbootscript=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${bootscript_name};
 ethprime=FEC
 fit_target=${loadaddr}
-fitargs=echo Confguring fit...; \
+fitargs=echo Configuring FIT target ...; \
 if test "${board_rev}" = "0.0"; then \
     env set fit_config conf-imx8mp-epc-tau.dtb; \
 elif test "${board_rev}" = "0.1"; then \
@@ -36,7 +36,16 @@ mmc dev ${mmcdev}; \
 if mmc rescan; then \
     run mmcargs; \
     run fitargs; \
-    bootm ${fit_target}; \
+    if bootm ${fit_target}; then \
+        echo Booting FIT ${fit_target}; \
+    else \
+        echo ERR: Booting FIT ${fit_target} failed!; \
+        if bootm; then \
+            echo Booting default FIT configuration...; \
+        else \
+            echo EMERGENCY: Booting default FIT configuration failed!; \
+        fi; \
+    fi; \
 else \
     echo WARN: Booting image from mmc failed!; \
 fi;
