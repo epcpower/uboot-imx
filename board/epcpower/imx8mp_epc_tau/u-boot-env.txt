@@ -13,11 +13,10 @@ ethprime=FEC
 fit_target=${loadaddr}
 fitargs=echo Configuring FIT target ...; \
 if test "${board_rev}" = "0.0"; then \
-    env set fit_config conf-imx8mp-epc-tau.dtb; \
-elif test "${board_rev}" = "0.1"; then \
-    env set fit_config conf-imx8mp-epc-tau-base-rev1.dtb; \
+    env set fit_config conf-imx8mp-epc-tau-base-rev0.dtb; \
 else \
-    echo WARN: No matching FIT configuration for board revision: ${board_rev}; \
+    echo "Using default FIT configuration"; \
+    env set fit_config conf-imx8mp-epc-tau.dtb; \
 fi; \
 if test -n "${fit_config}"; then \
     env set fit_target ${loadaddr}#${fit_config}; \
